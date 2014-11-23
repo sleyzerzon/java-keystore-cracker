@@ -5,6 +5,9 @@
  */
 package com.darylmathison.cracker.slave;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 /**
  *
  * @author Daryl
@@ -12,7 +15,7 @@ package com.darylmathison.cracker.slave;
 public class Slave {
 
     public static void main(String[] args) {
-        // TODO code application logic here
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:cracker.xml");
     }
     
 }
