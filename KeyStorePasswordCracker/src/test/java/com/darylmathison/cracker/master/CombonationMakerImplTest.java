@@ -22,7 +22,7 @@ public class CombonationMakerImplTest {
     
     @Before
     public void setup() {
-        maker = new CombonationMakerImpl(3, 4);
+        maker = new CombonationMakerImpl(1,3);
     }
     /**
      * Test of nextCombonation method, of class CombonationMakerImpl.
@@ -37,4 +37,9 @@ public class CombonationMakerImplTest {
         assertNull(maker.nextCombonation());
     }
     
+    @Test(expected=IllegalArgumentException.class)
+    public void testMaxIsLessThanMin() {
+        System.out.println("testMaxIsLessThanMin");
+        CombonationMakerImpl combo = new CombonationMakerImpl(2, 1);
+    }
 }
