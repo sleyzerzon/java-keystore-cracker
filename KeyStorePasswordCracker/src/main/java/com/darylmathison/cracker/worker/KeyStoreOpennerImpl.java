@@ -6,6 +6,7 @@
 package com.darylmathison.cracker.worker;
 
 import com.darylmathison.cracker.data.Answer;
+import com.darylmathison.cracker.data.TargetKeyStore;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
 import com.hazelcast.core.ITopic;
@@ -38,23 +39,22 @@ public class KeyStoreOpennerImpl implements KeyStoreOpenner, ApplicationContextA
         DataSerializable, MessageListener<byte[]> {
 
     private String qName;
-    private String topicName;
+    private String answerQName;
     private String targetName;
     private String name;
-    private IQueue<char[]> openningQ;
-    private ITopic<Answer> answerTopic;
+    private IQueue<char[]> passwordQ;
+    private IQueue<Answer> answerQ;
     private ITopic<byte[]> targetTopic;
     private ApplicationContext context;
     private KeyStore tester;
     private AtomicBoolean running;
     private byte[] store;
-    private boolean solved = false;
     
     @PostConstruct
     private void init() throws KeyStoreException {
         HazelcastInstance instance = context.getBean("instance", HazelcastInstance.class);
-        openningQ = instance.getQueue(qName);
-        answerTopic = instance.getTopic(topicName);
+        passwordQ = instance.getQueue(qName);
+        answerQ = instance.getQueue(answerQName);
         targetTopic = instance.getTopic(targetName);
         targetTopic.addMessageListener(this);
         tester = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -62,13 +62,13 @@ public class KeyStoreOpennerImpl implements KeyStoreOpenner, ApplicationContextA
     }
     
     @Override
-    public void setOpennerQName(String qName) {
+    public void setPasswordQName(String qName) {
         this.qName = qName;
     }
 
     @Override
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
+    public void setAnswerQName(String name) {
+        this.answerQName = name;
     }
 
     @Override
@@ -84,42 +84,42 @@ public class KeyStoreOpennerImpl implements KeyStoreOpenner, ApplicationContextA
     @Override
     public void onMessage(Message<byte[]> message) {
         store = message.getMessageObject();
-        solved = false;
     }
 
     @Override
-    public void setKeyStoreTopicName(String name) {
-        topicName = name;
+    public void setTargetTopicName(String name) {
+        targetName = name;
     }
     
     @Override
     public void run() {
         char[] guess;
         try {
+            System.out.println("Openner thread running");
             while(running.get()) {
-                guess = openningQ.poll(2, TimeUnit.SECONDS);
-                if(guess != null  && !solved) {
-                    InputStream in = new ByteArrayInputStream(store);
-                    try {
+                guess = passwordQ.poll(2, TimeUnit.SECONDS);
+                if(guess != null) {
+                    if(guess.length == 0) {
+                        running.set(false);
+                        passwordQ.add(guess);
+                        continue;
+                    }
+//                    InputStream in = new ByteArrayInputStream(store);
+                    try(InputStream in = new ByteArrayInputStream(store);) {
+//                        System.out.println("openning keystore with password " + String.valueOf(guess));
                         tester.load(in, guess);
                         Answer ans = new Answer();
                         ans.setKeyStore(store);
                         ans.setPassword(guess);
-                        answerTopic.publish(ans);
-                        solved = true;
+                        answerQ.add(ans);
                     } catch(CertificateException|IOException e) {
                         //do nothing, didn't work
-                    } finally {
-                        try {
-                            in.close();
-                        } catch(Exception e) {
-                            //do nothing
-                        }
                     }
                 }
             }
         } catch( NoSuchAlgorithmException | InterruptedException e ){
             running.set(false);
+            e.printStackTrace();
         }
     }
 
@@ -131,21 +131,32 @@ public class KeyStoreOpennerImpl implements KeyStoreOpenner, ApplicationContextA
     @Override
     public void writeData(ObjectDataOutput odo) throws IOException {
         odo.writeUTF(qName);
-        odo.writeUTF(topicName);
+        odo.writeUTF(answerQName);
         odo.writeUTF(name);
         odo.writeUTF(targetName);
+        odo.writeInt(store.length);
+        odo.write(store);
     }
 
     @Override
     public void readData(ObjectDataInput odi) throws IOException {
         qName = odi.readUTF();
-        topicName = odi.readUTF();
+        answerQName = odi.readUTF();
         name = odi.readUTF();
         targetName = odi.readUTF();
+        int len = odi.readInt();
+        store = new byte[len];
+        odi.readFully(store);
     }
 
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
         context = ac;
     }
+
+    @Override
+    public void setInitialTarget(TargetKeyStore target) {
+        store = target.getTargetCopy();
+    }
+    
 }
