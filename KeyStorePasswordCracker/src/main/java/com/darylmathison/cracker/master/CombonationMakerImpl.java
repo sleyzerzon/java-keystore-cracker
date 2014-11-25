@@ -89,16 +89,16 @@ public final class CombonationMakerImpl implements CombonationMaker {
             return null;
         }
         if(mostSignificantIndex < maxLength) {
-            System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
+//            System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
             if(currentIndex < mostSignificantIndex) {
                 if(charIndex[currentIndex] + 1 >= chars.length) {
                     while(currentIndex < mostSignificantIndex 
                             && charIndex[currentIndex] + 1 >= chars.length) {
                         currentIndex++;
                     }
-                    System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
+//                    System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
                     if(currentIndex == mostSignificantIndex) {
-                        System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
+//                        System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
                         mostSignificantIndex++;
                         charIndex[currentIndex]++;
                         currentIndex = (currentIndex > 0)? currentIndex - 1:0;
@@ -120,13 +120,13 @@ public final class CombonationMakerImpl implements CombonationMaker {
             } 
         } else { //if(mostSignificantIndex >= maxLength)
             if(currentIndex < mostSignificantIndex) {
-                System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
+//                System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
                 if(charIndex[currentIndex] + 1 >= chars.length) {
                     while(currentIndex < mostSignificantIndex 
                             && charIndex[currentIndex] + 1 >= chars.length) {
                         currentIndex++;
                     }
-                    System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
+//                    System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
                     if(currentIndex == mostSignificantIndex) {
                         empty = true;
                     } else {
@@ -147,7 +147,7 @@ public final class CombonationMakerImpl implements CombonationMaker {
                     builder.insert(0, chars[i]);
                 } 
             }
-            System.out.println("builder in nextCombonation -> " + builder.toString());
+//            System.out.println("builder in nextCombonation -> " + builder.toString());
             char[] ret = builder.toString().toCharArray();
             return ret;
         } else {

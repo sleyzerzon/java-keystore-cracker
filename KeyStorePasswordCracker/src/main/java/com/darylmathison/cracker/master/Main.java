@@ -6,6 +6,7 @@
 package com.darylmathison.cracker.master;
 
 import com.darylmathison.cracker.data.TargetKeyStore;
+import com.hazelcast.core.HazelcastInstance;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +24,7 @@ public class Main {
     public static final void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:cracker.xml");
         Spinner master = context.getBean("spinner", Spinner.class);
+        HazelcastInstance instance = context.getBean("instance", HazelcastInstance.class);
         byte[] targetStore = null;
         File targetFile = new File(args[0]);
         try(InputStream input = new FileInputStream(targetFile);
@@ -46,6 +48,8 @@ public class Main {
             thread.join();
         } catch(InterruptedException ie) {
             ie.printStackTrace();
+        } finally {
+            instance.shutdown();
         }
     }
 }

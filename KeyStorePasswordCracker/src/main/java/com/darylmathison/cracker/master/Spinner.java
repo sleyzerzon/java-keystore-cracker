@@ -69,7 +69,7 @@ public class Spinner implements ApplicationContextAware, Runnable {
             @Override
             public void itemAdded(ItemEvent<Answer> ie) {
                 //kill all guessing
-//                keepFeeding.set(false);
+                keepFeeding.set(false);
                 keepRunning.set(false);
                 passwordQ.clear();
                 comboMaker.reset();
@@ -153,24 +153,20 @@ public class Spinner implements ApplicationContextAware, Runnable {
         });
 
         try {
-            while (keepRunning.get()) {
-                while (keepFeeding.get() && !comboMaker.isEmpty()) {
-                    try {
-                        char[] pass = comboMaker.nextCombonation();
-                        if(pass == null) {
-                            System.out.println("help the password is null");
-                        }
-                    passwordQ.offer(pass, 1, TimeUnit.SECONDS);
-                    //get possible passwords and put them on the Q
-                    // When the maker is empty, turn the keepFeeding off.
-                    System.out.println("passwordQ is " + passwordQ.size());
-                    } catch(NullPointerException npe) {
-                        System.out.println("hit npe");
-                        npe.printStackTrace();
-                        passwordQ = instance.getQueue(passwordQName);
-                    }
+            char[] pass = comboMaker.nextCombonation();
+            int passLen = pass.length;
+            System.out.println("Length of password is " + passLen);
+            while (keepRunning.get() && pass != null) { 
+                if(passLen != pass.length) {
+                    passLen = pass.length;
+                    System.out.println("Length of password is " + passLen);
                 }
-                                //put a wait here till another target comes up.
+                while (!passwordQ.offer(pass, 2, TimeUnit.SECONDS) && keepFeeding.get()) {
+                    
+                }
+
+                pass = comboMaker.nextCombonation();
+                
             }
         } catch(InterruptedException ie) {
             System.out.println("leaving the scene");
@@ -179,6 +175,7 @@ public class Spinner implements ApplicationContextAware, Runnable {
 
     public void stop() {
         keepRunning.set(false);
+        keepFeeding.set(false);
     }
 
     private void launchWorker(Member member) {
