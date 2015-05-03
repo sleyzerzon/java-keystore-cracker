@@ -1,21 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.darylmathison.cracker.worker;
 
 import com.darylmathison.cracker.data.Answer;
 import com.darylmathison.cracker.data.TargetKeyStore;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IQueue;
-import com.hazelcast.core.ITopic;
-import com.hazelcast.core.Message;
-import com.hazelcast.core.MessageListener;
+import com.hazelcast.core.*;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.DataSerializable;
 import com.hazelcast.spring.context.SpringAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,10 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.PostConstruct;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  *
@@ -37,6 +31,8 @@ import org.springframework.context.ApplicationContextAware;
 @SpringAware
 public class KeyStoreOpennerImpl implements KeyStoreOpenner, ApplicationContextAware, 
         DataSerializable, MessageListener<byte[]> {
+
+    private static final Logger logger = LoggerFactory.getLogger(KeyStoreOpennerImpl.class);
 
     private String qName;
     private String answerQName;
@@ -95,7 +91,7 @@ public class KeyStoreOpennerImpl implements KeyStoreOpenner, ApplicationContextA
     public void run() {
         char[] guess;
         try {
-            System.out.println("Openner thread running");
+            logger.info("Openner thread running");
             while(running.get()) {
                 guess = passwordQ.poll(2, TimeUnit.SECONDS);
                 if(guess != null) {
@@ -106,7 +102,7 @@ public class KeyStoreOpennerImpl implements KeyStoreOpenner, ApplicationContextA
                     }
 //                    InputStream in = new ByteArrayInputStream(store);
                     try(InputStream in = new ByteArrayInputStream(store);) {
-//                        System.out.println("openning keystore with password " + String.valueOf(guess));
+                        logger.debug("openning keystore with password ${1}", String.valueOf(guess));
                         tester.load(in, guess);
                         Answer ans = new Answer();
                         ans.setKeyStore(store);

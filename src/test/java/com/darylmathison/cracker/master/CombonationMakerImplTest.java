@@ -1,20 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.darylmathison.cracker.master;
 
-import java.util.Arrays;
-import org.junit.Test;
 import org.junit.Before;
-import static org.junit.Assert.*;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.assertNull;
 
 /**
  *
  * @author Daryl
  */
 public class CombonationMakerImplTest {
+    private static Logger logger = LoggerFactory.getLogger(CombonationMakerImplTest.class);
+
     private CombonationMakerImpl maker;
     
     public CombonationMakerImplTest() {
@@ -29,7 +30,7 @@ public class CombonationMakerImplTest {
      */
     @Test
     public void testNextCombonation() {
-        System.out.println("nextCombonation");
+        logger.info("nextCombonation");
         while(!maker.isEmpty()) {
             System.out.println(Arrays.toString(maker.nextCombonation()));
         }
@@ -39,7 +40,7 @@ public class CombonationMakerImplTest {
     
     @Test(expected=IllegalArgumentException.class)
     public void testMaxIsLessThanMin() {
-        System.out.println("testMaxIsLessThanMin");
+        logger.info("testMaxIsLessThanMin");
         CombonationMakerImpl combo = new CombonationMakerImpl(2, 1);
     }
 }
