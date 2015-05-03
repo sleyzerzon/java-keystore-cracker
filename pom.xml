@@ -86,7 +86,7 @@
                     <!-- optional -->
                     
                     <arguments>
-                        <argument>../testKeyStore.jks</argument>
+                        <argument>testKeyStore.jks</argument>
                     </arguments>
                 </configuration>
             </plugin>

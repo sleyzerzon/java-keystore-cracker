@@ -102,7 +102,7 @@ public class KeyStoreOpennerImpl implements KeyStoreOpenner, ApplicationContextA
                     }
 //                    InputStream in = new ByteArrayInputStream(store);
                     try(InputStream in = new ByteArrayInputStream(store);) {
-                        logger.debug("openning keystore with password ${1}", String.valueOf(guess));
+                        logger.trace("openning keystore with password {}", String.valueOf(guess));
                         tester.load(in, guess);
                         Answer ans = new Answer();
                         ans.setKeyStore(store);

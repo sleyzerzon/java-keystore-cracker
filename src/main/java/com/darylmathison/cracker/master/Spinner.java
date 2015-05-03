@@ -5,6 +5,8 @@ import com.darylmathison.cracker.data.TargetKeyStore;
 import com.darylmathison.cracker.worker.KeyStoreOpenner;
 import com.hazelcast.core.*;
 import com.hazelcast.spring.context.SpringAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -20,6 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @SpringAware
 public class Spinner implements ApplicationContextAware, Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(Spinner.class);
 
     private String answerQName;
     private String passwordQName;
@@ -110,7 +114,7 @@ public class Spinner implements ApplicationContextAware, Runnable {
 
     @Override
     public void run() {
-        System.out.println("Spinner running");
+        logger.info("Spinner running");
         KeyStoreOpenner worker = context.getBean("worker", KeyStoreOpenner.class);
         worker.setInitialTarget(store);
         worker.setName("I don't know yet");
@@ -138,11 +142,11 @@ public class Spinner implements ApplicationContextAware, Runnable {
         try {
             char[] pass = comboMaker.nextCombonation();
             int passLen = pass.length;
-            System.out.println("Length of password is " + passLen);
+            logger.info("Length of password is {}", passLen);
             while (keepRunning.get() && pass != null) { 
                 if(passLen != pass.length) {
                     passLen = pass.length;
-                    System.out.println("Length of password is " + passLen);
+                    logger.info("Length of password is {}", passLen);
                 }
                 while (!passwordQ.offer(pass, 2, TimeUnit.SECONDS) && keepFeeding.get()) {
                     
@@ -152,7 +156,7 @@ public class Spinner implements ApplicationContextAware, Runnable {
                 
             }
         } catch(InterruptedException ie) {
-            System.out.println("leaving the scene");
+            logger.error("leaving the scene");
         }
     }
 
@@ -162,7 +166,7 @@ public class Spinner implements ApplicationContextAware, Runnable {
     }
 
     private void launchWorker(Member member) {
-        System.out.println("launching worker");
+        logger.info("launching worker");
         KeyStoreOpenner worker = context.getBean("worker", KeyStoreOpenner.class);
         worker.setInitialTarget(store);
         worker.setName("I don't know yet");

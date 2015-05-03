@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" monitorInterval="60" >
+
+    <Properties>
+        <Property name="pattern">%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="std" follow="true" target="SYSTEM_OUT" >
+            <PatternLayout pattern="${pattern}"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.hazelcast" additivity="false" level="warn">
+            <Appender-ref ref="std"/>
+        </Logger>
+        
+        <Logger name="com.darylmathison.cracker" additivity="false" level="debug">
+            <Appender-ref ref="std"/>
+        </Logger>
+        
+        <Root level="info">
+            <Appender-ref ref="std"/>
+        </Root>
+    </Loggers>
+</Configuration>

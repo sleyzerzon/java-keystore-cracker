@@ -37,16 +37,16 @@ public final class CombonationMakerImpl implements CombonationMaker {
             return null;
         }
         if(mostSignificantIndex < maxLength) {
-            logger.trace("mostSignificantIndex: ${1} currentIndex: ${2}", mostSignificantIndex, currentIndex);
+            logger.trace("mostSignificantIndex: {} currentIndex: {}", mostSignificantIndex, currentIndex);
             if(currentIndex < mostSignificantIndex) {
                 if(charIndex[currentIndex] + 1 >= chars.length) {
                     while(currentIndex < mostSignificantIndex 
                             && charIndex[currentIndex] + 1 >= chars.length) {
                         currentIndex++;
                     }
-                    logger.trace("mostSignificantIndex: ${1} currentIndex: ${2}", mostSignificantIndex, currentIndex);
+                    logger.trace("mostSignificantIndex: {} currentIndex: {}", mostSignificantIndex, currentIndex);
                     if(currentIndex == mostSignificantIndex) {
-                        logger.trace("mostSignificantIndex: ${1} currentIndex: ${2}", mostSignificantIndex, currentIndex);
+                        logger.trace("mostSignificantIndex: {} currentIndex: {}", mostSignificantIndex, currentIndex);
                         mostSignificantIndex++;
                         charIndex[currentIndex]++;
                         currentIndex = (currentIndex > 0)? currentIndex - 1:0;
@@ -68,13 +68,13 @@ public final class CombonationMakerImpl implements CombonationMaker {
             } 
         } else { //if(mostSignificantIndex >= maxLength)
             if(currentIndex < mostSignificantIndex) {
-                logger.trace("mostSignificantIndex: ${1} currentIndex: ${2}", mostSignificantIndex, currentIndex);
+                logger.trace("mostSignificantIndex: {} currentIndex: {}", mostSignificantIndex, currentIndex);
                 if(charIndex[currentIndex] + 1 >= chars.length) {
                     while(currentIndex < mostSignificantIndex 
                             && charIndex[currentIndex] + 1 >= chars.length) {
                         currentIndex++;
                     }
-//                    System.out.printf("mostSignificantIndex: %d currentIndex: %d\n", mostSignificantIndex, currentIndex);
+                    logger.trace("mostSignificantIndex: {} currentIndex: {}", mostSignificantIndex, currentIndex);
                     if(currentIndex == mostSignificantIndex) {
                         empty = true;
                     } else {
@@ -95,7 +95,7 @@ public final class CombonationMakerImpl implements CombonationMaker {
                     builder.insert(0, chars[i]);
                 } 
             }
-            logger.debug("builder in nextCombonation -> ${1}", builder.toString());
+            logger.trace("builder in nextCombonation -> {}", builder.toString());
             char[] ret = builder.toString().toCharArray();
             return ret;
         } else {
