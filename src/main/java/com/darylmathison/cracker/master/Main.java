@@ -14,6 +14,8 @@ import java.io.*;
 public class Main {
 
     public static final void main(String[] args) {
+        System.setProperty("hazelcast.logging.type", "slf4j");
+        System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:cracker.xml");
         Spinner master = context.getBean("spinner", Spinner.class);
         HazelcastInstance instance = context.getBean("instance", HazelcastInstance.class);
